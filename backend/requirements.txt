@@ -1,0 +1,15 @@
+fastapi==0.109.0
+uvicorn[standard]==0.27.0
+python-multipart==0.0.6
+# TensorFlow 2.20 supports Python 3.13 on Windows; 2.18.0 wheels are unavailable for this Python version
+tensorflow==2.20.0
+# Pillow 10.2.0 doesn't have wheels for Python 3.13; bump to a compatible version
+pillow>=10.4.0
+# Let TensorFlow resolve a compatible NumPy (NumPy 2.x supports Python 3.13)
+numpy>=2.0.0
+python-dotenv==1.0.1
+# Additional dependencies actually used in the codebase
+pydantic-settings>=2.1.0
+opencv-python-headless>=4.10.0.84
+SQLAlchemy>=2.0.0
+psycopg2-binary>=2.9.9
