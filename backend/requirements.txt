@@ -13,3 +13,13 @@ pydantic-settings>=2.1.0
 opencv-python-headless>=4.10.0.84
 SQLAlchemy>=2.0.0
 psycopg2-binary>=2.9.9
+# Database migrations
+alembic>=1.13.0
+# Auth and security
+python-jose[cryptography]>=3.3.0
+passlib[bcrypt]>=1.7.4
+python-multipart>=0.0.6
+# PDF generation
+reportlab>=4.0.0
+# Additional utilities
+aiofiles>=23.2.1

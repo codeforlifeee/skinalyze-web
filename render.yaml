@@ -1,0 +1,32 @@
+services:
+  # Web service for the backend API
+  - type: web
+    name: skinalyze-backend
+    env: docker
+    region: oregon
+    plan: free
+    rootDir: backend
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /health
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: skinalyze-db
+          property: connectionString
+      - key: AUTH0_DOMAIN
+        sync: false
+      - key: AUTH0_API_AUDIENCE
+        sync: false
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DEBUG
+        value: False
+      - key: CORS_ORIGINS
+        value: https://skinalyze-web.vercel.app
+
+databases:
+  # PostgreSQL database
+  - name: skinalyze-db
+    plan: free
+    databaseName: skinalyze
+    user: skinalyze_user
