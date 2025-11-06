@@ -370,6 +370,7 @@ export default function Login() {
       name: formData.name,
       email: formData.email,
       specialty: formData.specialty,
+      role: 'clinician'
     }
 
     login(user)
@@ -390,6 +391,7 @@ export default function Login() {
       name: 'Dr. Sarah Johnson',
       email: 'sarah.johnson@hospital.com',
       specialty: 'Dermatology',
+      role: 'clinician'
     }
     
     login(demoUser)
@@ -437,6 +439,46 @@ export default function Login() {
     },
   ]
 
+  const handlePatientLogin = () => {
+    setIsLoggingIn(true)
+    
+    const patientUser = {
+      id: 'patient-1',
+      name: 'John Smith',
+      email: 'john.smith@email.com',
+      role: 'patient',
+      patientId: 'PT-12345',
+    }
+    
+    login(patientUser)
+    toast.success('Logged in as patient')
+    
+    setTimeout(() => {
+      setIsLoggingIn(false)
+      navigate('/patient/journey', { replace: true })
+    }, 100)
+  }
+
+  const handleDemoPatientLogin = () => {
+    setIsLoggingIn(true)
+    
+    const demoPatientUser = {
+      id: 'demo-patient-1',
+      name: 'Demo Patient',
+      email: 'demo.patient@email.com',
+      role: 'patient',
+      patientId: 'PT-DEMO',
+    }
+    
+    login(demoPatientUser)
+    toast.success('Logged in as demo patient')
+    
+    setTimeout(() => {
+      setIsLoggingIn(false)
+      navigate('/patient/journey', { replace: true })
+    }, 100)
+  }
+
   return (
     <div className="min-h-screen flex">
       {/* Left Side - Branding */}
@@ -469,7 +511,7 @@ export default function Login() {
 
         <div className="text-primary-100 text-sm">
           <p>© 2025 SkinAlyze. All rights reserved.</p>
-          <p className="mt-2">Clinician-only platform for dermatologic care</p>
+          <p className="mt-2">AI-powered dermatology platform</p>
         </div>
       </div>
 
@@ -488,7 +530,7 @@ export default function Login() {
 
           <div className="card bg-white">
             <h2 className="text-2xl font-bold text-gray-900 mb-2">Welcome</h2>
-            <p className="text-gray-600 mb-6">Sign in to access the dermatology platform</p>
+            <p className="text-gray-600 mb-6">Sign in to access the platform</p>
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
@@ -533,7 +575,7 @@ export default function Login() {
               </div>
 
               <button type="submit" className="w-full btn-primary py-3">
-                Sign In
+                Sign In as Clinician
               </button>
             </form>
 
@@ -543,16 +585,35 @@ export default function Login() {
                   <div className="w-full border-t border-gray-300"></div>
                 </div>
                 <div className="relative flex justify-center text-sm">
-                  <span className="px-2 bg-white text-gray-500">Or</span>
+                  <span className="px-2 bg-white text-gray-500">Quick Access</span>
                 </div>
               </div>
 
-              <button
-                onClick={handleDemoLogin}
-                className="w-full mt-4 btn-secondary py-3"
-              >
-                Quick Demo Login
-              </button>
+              <div className="mt-4 space-y-3">
+                <button
+                  onClick={handleDemoLogin}
+                  className="w-full btn-secondary py-3 flex items-center justify-center gap-2"
+                >
+                  <Users className="w-4 h-4" />
+                  Clinician Demo Login
+                </button>
+                
+                <button
+                  onClick={handlePatientLogin}
+                  className="w-full bg-blue-50 text-blue-700 border border-blue-300 py-3 rounded-lg hover:bg-blue-100 transition-colors flex items-center justify-center gap-2"
+                >
+                  <Activity className="w-4 h-4" />
+                  Patient Login
+                </button>
+                
+                <button
+                  onClick={handleDemoPatientLogin}
+                  className="w-full bg-green-50 text-green-700 border border-green-300 py-3 rounded-lg hover:bg-green-100 transition-colors flex items-center justify-center gap-2"
+                >
+                  <Zap className="w-4 h-4" />
+                  Demo Patient Login
+                </button>
+              </div>
             </div>
 
             <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
@@ -561,7 +622,7 @@ export default function Login() {
                 <div>
                   <p className="text-sm font-medium text-yellow-800">Demo Mode</p>
                   <p className="text-xs text-yellow-700 mt-1">
-                    This is a demo application. In production, restricted to verified healthcare professionals.
+                    This is a demo application. Patient login allows you to view diagnosis reports.
                   </p>
                 </div>
               </div>

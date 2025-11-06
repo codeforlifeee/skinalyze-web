@@ -195,6 +195,7 @@ export function AuthProvider({ children }) {
       name: 'Dr. Sarah Johnson',
       email: 'sarah.johnson@hospital.com',
       specialty: 'Dermatology',
+      role: 'clinician'
     }
     
     console.log('Logging in user:', user)

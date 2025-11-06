@@ -469,6 +469,7 @@ import LoadingSpinner from './components/common/LoadingSpinner'
 // Eager load critical pages
 import Login from './pages/Login'
 import Dashboard from './pages/Dashboard'
+import PatientHealthJourney from './pages/PatientHealthJourney'
 
 // Lazy load other pages
 const PatientList = lazy(() => import('./pages/PatientList'))
@@ -557,6 +558,13 @@ function AppContent() {
               )
             } 
           />
+
+          {/* Patient Routes - No sidebar/navbar */}
+          <Route path="/patient/journey" element={
+            <ProtectedRoute>
+              <PatientHealthJourney />
+            </ProtectedRoute>
+          } />
 
           {/* Protected Routes */}
           <Route
