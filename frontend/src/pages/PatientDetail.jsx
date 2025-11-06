@@ -1,13 +1,16 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { ArrowLeft, Calendar, User, Activity, Share2, TrendingUp } from 'lucide-react';
+import { ArrowLeft, Calendar, User, Activity, Share2, TrendingUp, FileText } from 'lucide-react';
 import { getMockPatients } from '../services/api';
 import LoadingSpinner from '../components/common/LoadingSpinner';
+import DiagnosisHistory from '../components/patient/DiagnosisHistory';
+import TreatmentProgress from '../components/patient/TreatmentProgress';
 
 export default function PatientDetail() {
   const { id } = useParams();
   const [patient, setPatient] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState('diagnoses'); // 'diagnoses' or 'progress'
 
   useEffect(() => {
     loadPatient();
@@ -17,6 +20,47 @@ export default function PatientDetail() {
     try {
       const response = await getMockPatients();
       const foundPatient = response.data.find(p => p.id === id);
+      
+      // Add mock diagnosis and progress data
+      if (foundPatient) {
+        foundPatient.diagnoses = [
+          {
+            date: 'October 30, 2025 at 04:23 PM',
+            condition: 'Melanocytic Nevus',
+            riskLevel: 'Low Risk',
+            confidence: 86,
+            notes: 'Benign-appearing nevus. Advise routine monitoring.',
+            metrics: {
+              asymmetry: 97,
+              border: 91,
+              colorVariation: 74,
+              diameter: '9.0',
+              evolution: 'Absent',
+              pigmentNet: 15,
+              blueWhite: 21,
+              vessels: 2
+            }
+          }
+        ];
+        
+        foundPatient.progressEntries = [
+          {
+            date: 'Oct 31, 2025',
+            score: 65,
+            title: 'Healing Progress',
+            notes: 'Post-observation: stable appearance, no alarming changes.',
+            trend: 'stable'
+          },
+          {
+            date: 'Nov 4, 2025',
+            score: 74,
+            title: 'Healing Progress',
+            notes: 'Slight improvement in border regularity and color uniformity.',
+            trend: 'up'
+          }
+        ];
+      }
+      
       setPatient(foundPatient);
     } catch (error) {
       console.error('Failed to load patient:', error);
@@ -46,22 +90,18 @@ export default function PatientDetail() {
 
   return (
     <div className="space-y-6">
+      {/* Header */}
       <div className="flex items-center gap-4">
-        <Link to="/patients" className="p-2 hover:bg-gray-100 rounded-lg">
-          <ArrowLeft className="w-5 h-5" />
+        <Link to="/patients" className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+          <ArrowLeft className="w-5 h-5 text-gray-600" />
         </Link>
         <div className="flex-1">
-          <h1 className="text-2xl font-bold text-gray-900">{patient.name}</h1>
-          <p className="text-gray-600">Patient Details</p>
+          <h1 className="text-2xl font-bold text-gray-900">Patient Details</h1>
         </div>
         <div className="flex gap-3">
           <Link to={`/patients/${id}/analyze`} className="btn-primary flex items-center gap-2">
             <Activity className="w-5 h-5" />
             New Analysis
-          </Link>
-          <Link to={`/patients/${id}/progress`} className="btn-secondary flex items-center gap-2">
-            <TrendingUp className="w-5 h-5" />
-            Progress
           </Link>
           <Link to={`/patients/${id}/share`} className="btn-secondary flex items-center gap-2">
             <Share2 className="w-5 h-5" />
@@ -70,77 +110,95 @@ export default function PatientDetail() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-1">
-          <div className="card">
-            <div className="w-24 h-24 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <span className="text-primary-700 font-bold text-3xl">
-                {patient.name.split(' ').map(n => n[0]).join('')}
-              </span>
+      {/* Patient Info Card */}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div className="flex items-start gap-6">
+          {/* Avatar */}
+          <div className="w-20 h-20 bg-primary-500 rounded-full flex items-center justify-center flex-shrink-0">
+            <span className="text-white font-bold text-2xl">
+              {patient.name.split(' ').map(n => n[0]).join('')}
+            </span>
+          </div>
+          
+          {/* Info */}
+          <div className="flex-1">
+            <h2 className="text-2xl font-bold text-gray-900 mb-1">{patient.name}</h2>
+            <div className="flex items-center gap-4 text-sm text-gray-600 mb-4">
+              <span>Patient ID: {patient.id}</span>
+              <span>•</span>
+              <span>Skin Type: <span className="font-medium text-primary-600">Type {patient.fitzpatrickType}</span></span>
             </div>
-            
-            <div className="text-center mb-6">
-              <h2 className="text-xl font-bold text-gray-900">{patient.name}</h2>
-              <p className="text-gray-600 mt-1">{patient.age} years old • {patient.gender}</p>
-            </div>
+            <p className="text-sm text-gray-500">Patient since November 2025</p>
+          </div>
 
-            <div className="space-y-3 text-sm">
-              <div className="flex items-center justify-between py-2 border-b border-gray-200">
-                <span className="text-gray-600">Status</span>
-                <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                  patient.status === 'active' ? 'bg-green-100 text-green-700' :
-                  patient.status === 'urgent' ? 'bg-red-100 text-red-700' :
-                  'bg-gray-100 text-gray-700'
-                }`}>
-                  {patient.status}
-                </span>
+          {/* Stats */}
+          <div className="flex gap-8">
+            <div className="text-center">
+              <div className="text-3xl font-bold text-primary-600">
+                {patient.diagnoses?.length || 1}
               </div>
-              <div className="flex items-center justify-between py-2 border-b border-gray-200">
-                <span className="text-gray-600">Fitzpatrick Type</span>
-                <span className="font-medium text-gray-900">{patient.fitzpatrickType}</span>
+              <div className="text-sm text-gray-600">Diagnoses</div>
+            </div>
+            <div className="text-center">
+              <div className="text-3xl font-bold text-primary-600">
+                {patient.progressEntries?.length || 2}
               </div>
-              <div className="flex items-center justify-between py-2 border-b border-gray-200">
-                <span className="text-gray-600">Current Condition</span>
-                <span className="font-medium text-gray-900">{patient.condition}</span>
+              <div className="text-sm text-gray-600">Progress Entries</div>
+            </div>
+            <div className="text-center">
+              <div className="text-3xl font-bold text-orange-600">
+                {patient.highRiskCount || 0}
               </div>
-              <div className="flex items-center justify-between py-2">
-                <span className="text-gray-600">Last Visit</span>
-                <span className="font-medium text-gray-900">{patient.lastVisit}</span>
-              </div>
+              <div className="text-sm text-gray-600">High Risk</div>
             </div>
           </div>
         </div>
+      </div>
 
-        <div className="lg:col-span-2">
-          <div className="card">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Medical History</h3>
-            <div className="space-y-4">
-              <div>
-                <label className="text-sm text-gray-600">Chief Complaint</label>
-                <p className="text-gray-900 mt-1">Persistent skin lesions on forearm with itching</p>
-              </div>
-              <div>
-                <label className="text-sm text-gray-600">Allergies</label>
-                <p className="text-gray-900 mt-1">None reported</p>
-              </div>
-              <div>
-                <label className="text-sm text-gray-600">Current Medications</label>
-                <p className="text-gray-900 mt-1">Topical corticosteroids as needed</p>
-              </div>
-            </div>
-          </div>
+      {/* Tabs */}
+      <div className="flex gap-2 border-b border-gray-200">
+        <button
+          onClick={() => setActiveTab('diagnoses')}
+          className={`flex items-center gap-2 px-6 py-3 font-medium transition-colors relative ${
+            activeTab === 'diagnoses'
+              ? 'text-primary-600 border-b-2 border-primary-600'
+              : 'text-gray-600 hover:text-gray-900'
+          }`}
+        >
+          <FileText className="w-5 h-5" />
+          Diagnoses
+          <span className={`ml-2 px-2 py-0.5 rounded-full text-xs font-semibold ${
+            activeTab === 'diagnoses' ? 'bg-primary-100 text-primary-700' : 'bg-gray-100 text-gray-700'
+          }`}>
+            {patient.diagnoses?.length || 1}
+          </span>
+        </button>
+        <button
+          onClick={() => setActiveTab('progress')}
+          className={`flex items-center gap-2 px-6 py-3 font-medium transition-colors relative ${
+            activeTab === 'progress'
+              ? 'text-primary-600 border-b-2 border-primary-600'
+              : 'text-gray-600 hover:text-gray-900'
+          }`}
+        >
+          <TrendingUp className="w-5 h-5" />
+          Progress
+          <span className={`ml-2 px-2 py-0.5 rounded-full text-xs font-semibold ${
+            activeTab === 'progress' ? 'bg-primary-100 text-primary-700' : 'bg-gray-100 text-gray-700'
+          }`}>
+            {patient.progressEntries?.length || 2}
+          </span>
+        </button>
+      </div>
 
-          <div className="card mt-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Visits</h3>
-            <div className="text-center py-8 text-gray-500">
-              <Calendar className="w-12 h-12 mx-auto mb-3 opacity-50" />
-              <p>No visits recorded yet</p>
-              <Link to={`/patients/${id}/analyze`} className="text-primary-600 hover:underline text-sm mt-2 inline-block">
-                Create first analysis
-              </Link>
-            </div>
-          </div>
-        </div>
+      {/* Tab Content */}
+      <div className="min-h-[500px]">
+        {activeTab === 'diagnoses' && (
+          <DiagnosisHistory diagnoses={patient.diagnoses} />
+        )}
+        {activeTab === 'progress' && (
+          <TreatmentProgress progressEntries={patient.progressEntries} />
+        )}
       </div>
     </div>
   );
