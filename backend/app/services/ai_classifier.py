@@ -19,7 +19,8 @@ class SkinConditionClassifier:
         self.output_details = self.interpreter.get_output_details()
         
         # Load condition mappings
-        config_path = Path(model_path).parent / "model_config.json"
+        # model_config.json is in app/ml/ directory, not app/ml/models/
+        config_path = Path(model_path).parent.parent / "model_config.json"
         with open(config_path) as f:
             config = json.load(f)
             self.condition_labels = config["conditions"]
